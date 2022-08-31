@@ -32,6 +32,8 @@ public class OrderService {
 
 	private final String BACK_ORDER = "Back order";
 	private final String PROCESSED = "processed";
+	private final String ORDER_PLACED = "order placed";
+	private final String PROCESSING = "processing";
 
 	@Autowired
 	OrderHeaderRepo headerRepo;
@@ -58,10 +60,6 @@ public class OrderService {
 
 	public void addAllOrders(OrderDto orderDto) {
 
-		String status = orderStatus(orderDto);
-
-		log.info("ststus............." + status);
-
 		OrderHeaderEntity headerEntity = new OrderHeaderEntity();
 		List<OrderLineEntity> listOfLineEntity = new ArrayList<OrderLineEntity>();
 
@@ -76,14 +74,14 @@ public class OrderService {
 
 			headerEntity.setOrderDate(orderDto.getOrderDate());
 			headerEntity.setCustomerId(orderDto.getCustomerId());
-			headerEntity.setOrderStatus("processing");
+			headerEntity.setOrderStatus("PROCESSING");
 			headerEntity.setSalesChannel("online");
 
 			headerRepo.save(headerEntity);
 
 			orderLineEntity.setItemId(orderDto.getItemId());
 
-			orderLineEntity.setLineStatus(status);
+			orderLineEntity.setLineStatus(ORDER_PLACED);
 
 			orderLineEntity.setOrderHeaderId(headerEntity.getOrderId());
 			orderLineEntity.setPromisedDate(orderDto.getExpectedDate());
@@ -98,10 +96,13 @@ public class OrderService {
 
 	}
 
-	public String orderStatus(OrderDto orderDto) {
-
-		return webClient.post().uri("/checkStatus").syncBody(orderDto).retrieve().bodyToMono(String.class).block();
-	}
+	/*
+	 * public String orderStatus(OrderDto orderDto) {
+	 * 
+	 * return
+	 * webClient.post().uri("/checkStatus").syncBody(orderDto).retrieve().bodyToMono
+	 * (String.class).block(); }
+	 */
 
 	public List<OrderLineEntity> getOrderLines(int itemId) {
 
